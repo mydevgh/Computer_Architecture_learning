@@ -11,6 +11,8 @@
 - [Lecture 1: Introduction and Basics](#01)
 - [Lecture 2: Fundamentals, Memory Hierarchy, Caches](#02)
 - [Lecture 3: Cache Management and Memory Parallelism](#03)
+- [Lecture 4: Main Memory and DRAM Fundamentals](#04)
+- [Lecture 5: DRAM, Memory Control, Memory Latency](#05)
 - []()
 - []()
 
@@ -175,11 +177,112 @@ Miss Status Handling Registers  记录 miss 的状态与数据
 
 &nbsp;   
 <a id="04"></a>
-## 
+## Lecture 4: Main Memory and DRAM Fundamentals
+
+### 提高 Cache 带宽
+
+multi-access per cycle or consecutive cycle
+
+#### Banking (Interleavig)
+
+把 address 划分成不同的 banks，access latency 在多个 bank 上重叠
+
+### Memory System
+
+- bandwidth
+- latency
+- capacity
+- energy
+
+### Main Memory Fundamental
+
+对 latency 的处理方法：分 bank。比如 4 个 bank，要访问 32b 数据，一个 bank 提供 8 bit，如果 latency 是 3 cycle，那就刚好不用阻塞。
+
+Rank: Multiple chips operated together to form a wide interface
+
+<img src="./assets/04_generalized_memory_structure.png" width="400"/>
+
 
 &nbsp;   
 <a id="05"></a>
-## 
+## Lecture 5: DRAM, Memory Control, Memory Latency
+
+### Latency
+
+- CPU -> Controller (transfer time)
+- Controller latency
+  - queuing & scheduling delay
+  - access -> commands
+- Controller -> DRAM (transfer time)
+- DRAM bank latency
+  - CAS (column address strobe) if row hit
+  - RAS + CAS (row address strobe + column address strobe)
+  - PRE + RAS + CAS
+- DRAM -> Controller (transfer time)
+  - bus latency
+- Controller -> CPU (transfer time)
+
+### Multiple Banks (Interleaving) and Channels
+
+multi-bank：并发访问 DRAM   
+multi-channel：增加带宽
+
+<img src="./assets/05_row_interleaving.png" width="400"/>
+
+把 row bit 放到高位，因为内存地址通常是连续访问的，增大 row hit rate
+
+<img src="./assets/05_address_mapping.png" width="400"/>
+
+如果 hardware 向 OS 暴露 bank bit，那么 OS 可以把不同进程在物理空间上隔离
+
+### DRAM refresh
+
+<img src="./assets/05_refresh.png" width="400"/>
+
+### DRAM Controller
+
+<img src="./assets/05_DRAM_contoller.png" width="400"/>
+
+DRAM Controller 位于 CPU chip
+
+#### 功能
+
+- 保证在 DRAM 上的正确操作
+- 资源冲突
+- 调度
+
+### 调度
+
+调度就是基于优先级对请求排序：
+
+- request 顺序
+- row buffer hit
+- request 类型（prefetch, read, write）
+- request criticality
+  - stall processor
+  - dependency
+
+### DRAM timing constraint
+
+DRAM Controller 在 issue 两个指令之间有一个 latency，为了等待 DRAM 完成操作。这一等待是同步的，也就是说提前设置好的 latency，DRAM Controller 假定在这个时间后 DRAM 已经完成操作。如果 DRAM 提前完成，并不通知 Controller。
+
+### Simulation
+
+- 快速得出该决策在某种环境下的结果
+- 模拟现有系统环境，得到准确估计结果
+- Trade-Offs：速度，灵活，准确
+
+### Memory Latency
+
+2h15min 详细讲了 DRAM 的构成
+
+- desgin for DRAM
+  - 最大化 capacity，而非 latency
+  - sense amplifier 的大小是 cell 的几百倍，少 sense amplifier 节省空间，但是增加 bitline 长度，增加了 latency
+- timing constraints 按照最坏的情况设置
+
+trade-off：在 sense amplifier 上再做一层 cache
+
 
 &nbsp;   
 <a id=""></a>
