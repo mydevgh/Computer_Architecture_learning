@@ -13,7 +13,7 @@
 - [Lecture 3: Cache Management and Memory Parallelism](#03)
 - [Lecture 4: Main Memory and DRAM Fundamentals](#04)
 - [Lecture 5: DRAM, Memory Control, Memory Latency](#05)
-- []()
+- [Lecture 6: Low-Latency DRAM and Processing In Memory](#06)
 - []()
 
 
@@ -281,12 +281,32 @@ DRAM Controller 在 issue 两个指令之间有一个 latency，为了等待 DRA
   - sense amplifier 的大小是 cell 的几百倍，少 sense amplifier 节省空间，但是增加 bitline 长度，增加了 latency
 - timing constraints 按照最坏的情况设置
 
+#### Tiered-Latency DRAM
+
 trade-off：在 sense amplifier 上再做一层 cache
 
 
 &nbsp;   
-<a id=""></a>
-## 
+<a id="06"></a>
+## Lecture 6: Low-Latency DRAM and Processing In Memory
+
+### Latency
+
+DRAM latency 通常设置为较大值，因为考虑到温度，设备，等原因的 worst case，因此在通常情况下会导致时间浪费
+
+- temperature：温度高 latency 高
+- DRAM cell：大小不一样，小的 latency 高
+- latency variation：sense amplifier 和 row 的距离
+
+<img src="./assets/06_design_induced_variation_aware.png" width="400"/>
+
+### Process in Memory
+
+- **move data overhead - bitline**
+- **bulk data movement - hardware level**
+- bitwise operation
+- Graph Proccess
+
 
 &nbsp;   
 <a id=""></a>
