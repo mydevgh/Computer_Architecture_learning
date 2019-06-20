@@ -7,6 +7,7 @@
 > 15年的lab：[Labs](http://www.archive.ece.cmu.edu/~ece447/s15/doku.php?id=labs)   
 > 15年的 schedule：[Schedule](http://www.archive.ece.cmu.edu/~ece447/s15/doku.php?id=schedule)
 
+> 这门课中讲了大量的 trade-offs，很多我没有记录
 
 - [Lecture 1: Introduction and Basics](#01)
 - [Lecture 2: Fundamentals, Memory Hierarchy, Caches](#02)
@@ -14,6 +15,7 @@
 - [Lecture 4: Main Memory and DRAM Fundamentals](#04)
 - [Lecture 5: DRAM, Memory Control, Memory Latency](#05)
 - [Lecture 6: Low-Latency DRAM and Processing In Memory](#06)
+- [Lecture 7: Emerging Memory Technologies](#07)
 - []()
 
 
@@ -302,15 +304,27 @@ DRAM latency 通常设置为较大值，因为考虑到温度，设备，等原�
 
 ### Process in Memory
 
+computation 和 storage 距离太远
+
 - **move data overhead - bitline**
 - **bulk data movement - hardware level**
 - bitwise operation
 - Graph Proccess
 
+<img src="./assets/07_PEI.png" width="400">
+
+locality monitor 决定在 cache 还是 memory 中执行
+
+假设 cache 非常差以致于可以忽略，那么所有操作都*应该*在 memory module 执行
 
 &nbsp;   
-<a id=""></a>
-## 
+<a id="07"></a>
+## Lecture 7: Emerging Memory Technologies
+
+resistive memory：non volatile, phase change memory
+
+hybrid memory - DRAM + PCM
+
 
 &nbsp;   
 <a id=""></a>
