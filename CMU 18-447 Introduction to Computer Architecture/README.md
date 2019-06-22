@@ -16,6 +16,8 @@
 - [Lecture 5: DRAM, Memory Control, Memory Latency](#05)
 - [Lecture 6: Low-Latency DRAM and Processing In Memory](#06)
 - [Lecture 7: Emerging Memory Technologies](#07)
+- [Lecture 8: SIMD Processors and GPUs](#08)
+- [Lecture 10: Branch Prediction](#10)
 - []()
 
 
@@ -309,7 +311,7 @@ computation 和 storage 距离太远
 - **move data overhead - bitline**
 - **bulk data movement - hardware level**
 - bitwise operation
-- Graph Proccess
+- Graph Process
 
 <img src="./assets/07_PEI.png" width="400">
 
@@ -327,12 +329,74 @@ hybrid memory - DRAM + PCM
 
 
 &nbsp;   
-<a id=""></a>
-## 
+<a id="08"></a>
+## Lecture 8: SIMD Processors and GPUs
+
+<img src="./assets/08_array_vector.png" width="400">
+
+- Array Processor：指令在 **不同位置** **同时** 执行
+- Vector Processor：指令在 **相同位置** **连续时间** 执行
+  - （我觉得这有点问题，有些指令周期不一样，还得有同步措施）
+
+### Vector Processor
+
+basic address + stride length
+
+- 设计数据结构与硬件相匹配
+- stride length 和 bank number 影响性能
+
+scatter, gather, conditional select：将 control flow dependency 转换为 data dependency
+
 
 &nbsp;   
-<a id=""></a>
-## 
+<a id="10"></a>
+## Lecture 10: Branch Prediction
+
+目标：**为了让 pipeline 保持 full，要尽快知道 next fetch instruction address**
+
+### Control Dependence Handling
+
+在 pipeline 模型中，fetch stage 需要知道下一个 PC address，面临的问题有
+
+- 当前指令是否是分支
+  - 如果 BTB 返回一个 target address，那么一定是分支
+  - 或者在 instruction cache 中判断
+- （如果是分支）选择哪一个
+  - 静态/动态 分支预测
+- 跳转地址（如果需要跳转）
+  - BTB: branch target buffer
+
+<img src="./assets/10_BTB.png" width="400">
+
+### 静态分支预测
+
+- 固定预测
+- Backward taken, forward not taken
+  - 循环语句一般 target 在 loop 判断之前，所以让假定跳转
+- Profile based
+  - 提前分析，并给出 hint
+- Program analysis based
+  - `#define likely(x) __builtin_expect(!!(x), 1)`
+
+### 动态分支预测
+
+#### Last-Time Predictor (One-Bit Counter)
+
+<img src="./assets/10_last_time_predictor.png" width="400">
+
+#### Two-Bit Counter Prediction - 饱和计数器
+
+<img src="./assets/10_two_bit_cnt_prediction.png" width="300">
+
+#### Two-Level Prediction
+
+- 不同的分支之间有影响
+- 同一个分支的一系列历史
+
+<img src="./assets/10_two_level_branch_prediction.png" width="400">
+
+GHR 是全局 branch 历史，指向 pattern table（共 2^n） 的一项，每一项都是饱和计数器
+
 
 &nbsp;   
 <a id=""></a>
