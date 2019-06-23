@@ -18,6 +18,8 @@
 - [Lecture 7: Emerging Memory Technologies](#07)
 - [Lecture 8: SIMD Processors and GPUs](#08)
 - [Lecture 10: Branch Prediction](#10)
+- [Lecture 11: Control-Flow Handling](#11)
+- [Lecture 12: Memory Interference and QoS](#12)
 - []()
 
 
@@ -399,8 +401,96 @@ GHR 是全局 branch 历史，指向 pattern table（共 2^n） 的一项，每�
 
 
 &nbsp;   
+<a id="11"></a>
+## Lecture 11: Control-Flow Handling
+
+### Trace Cache
+
+注意到一个事实：程序总是频繁地执行一个 trace（一系列指令，可能不连续）
+
+因此，我们把这些 **动态指令序列** 缓存起来，一次 fetch
+
+<img src="./assets/11_trace_cache.png" width="300"/>
+
+- 降低了 fetch 间隔
+- 不需要 decode（已经 decode）
+- trace 视为一个整体操作（没有分支），可以内部优化
+- fill unit 生成 trace
+- 如何 index trace cache
+- trace 冗余（例如 ABC，ABD）
+- 需要多个分支预测
+
+### Predicated Execution
+
+将 control dependency 转变成 data dependency（例如：CMOV, SETG）   
+将 选择哪个branch 转变成 等待data完成计算
+
+useless work
+
+如果 branch hard to predict，可以 Predicated Execution；否则使用 branch prediction
+
+### Prediction Latency
+
+<img src="./assets/11_prediction_latency.png" width="360"/>
+
+
+&nbsp;   
+<a id="12"></a>
+## Lecture 12: Memory Interference and QoS
+
+资源：functional units, pipeline, cache, bus, memory
+
+资源会在 multi-core 和 multi-thread 共享，multi-thread 可以共享 L1 cache，register 和 pipeline。这里主要讨论 multi-core 共享 memory，memory controller，bus 和 shared cache
+
+### Memory Scheduling
+
+- DRAM Controller 如何调度 request
+- request latency
+- 考虑到 banks，row hit
+
+#### Parallelism-Aware Scheduler
+
+<img src="./assets/12_parallelism_aware_scheduler.png" width="400"/>
+
+- 对一个 core 的 request，在不同 bank 上 parallel access
+- 会导致 starvation
+  - 解决方案是把 request 按 batch 执行，每个 batch 内 parallel access
+
+<img src="./assets/12_batch_parallelism.png" width="120"/>
+
+#### Batch 内部调度
+
+- FIFO
+- row hit
+- 指定 core 优先级（shortest stall-time first）
+
+<img src="./assets/12_within_batch_scheduling.png" width="400"/>
+
+### Thread Cluster Memory Scheduling
+
+**混合 fairness 和 throughput** 方法，分为两个 cluster
+
+- **throughput**: memory-non-intensive threads
+- **fairness**: memory-intensive
+  - rank shuffle：由于对 interference 的影响不同
+  - row buffer locality 导致 interference
+  - bank-level parallelism 受 interference 影响
+
+<img src="./assets/12_thread_cluster_memory_scheduling.png" width="400"/>
+
+### Blacklisting Memory Scheduler
+
+- rank 开销大，取代的做法是 **group**
+- consecutive requests 导致 interference，加入 blacklist
+- 定期清空 blacklist
+
+<img src="./assets/12_blacklist_group.png" width="300"/>
+
+
+&nbsp;   
 <a id=""></a>
 ## 
+
 
 &nbsp;   
 <a id=""></a>
