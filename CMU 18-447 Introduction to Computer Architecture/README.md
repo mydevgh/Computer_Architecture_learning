@@ -20,6 +20,8 @@
 - [Lecture 10: Branch Prediction](#10)
 - [Lecture 11: Control-Flow Handling](#11)
 - [Lecture 12: Memory Interference and QoS](#12)
+- [Lecture 13: Memory Interference and QoS (II)](#13)
+- [Lecture 15: Multi-Core Cache Management](#15)
 - []()
 
 
@@ -488,9 +490,64 @@ useless work
 
 
 &nbsp;   
+<a id="13"></a>
+## Lecture 13: Memory Interference and QoS (II)
+
+QoS 太细节了，主要是我并不知道底层硬件可以提供什么，需要暴露一些细节和软件配合来达优化。很多方案看起来说的很好，也就只能听听了。。。换句话说我不能 reason about low level hardware
+
+### Decoupled Direct Memory Access
+
+<img src="./assets/13_dual_data_port_DRAM.png" width="400"/>
+
+
+&nbsp;   
+<a id="15"></a>
+## Lecture 15: Multi-Core Cache Management
+
+### Multi-Core Caching Issues
+
+- cache efficiency
+- shared data between core
+- connect cache
+  - Non-uniform cache access
+  - cache interconnect
+
+### Controlled Shared Caching
+
+#### Hardware-Based Cache Partitioning
+
+- way-based
+- block-based
+- dynamic fairness (on miss rate slowdown)
+
+#### Software-Based Cache Partitioning
+
+- page coloring
+
+### Private/Shared Caching
+
+- private cahce，但可以共享给别的 core
+- spill / receive
+
+### Non-Uniform Cache Access
+
+### Efficient Cache Utilization
+
+- placement
+  - read/write miss?
+- replacement (insertion)
+  - 考虑到 streaming access
+  - block **reuse prediction**
+- schedule
+
+### Cache Compression
+
+> 维护起来太复杂，记得 leveldb 里面 SSTable format，简直了。。
+
+
+&nbsp;   
 <a id=""></a>
 ## 
-
 
 &nbsp;   
 <a id=""></a>
