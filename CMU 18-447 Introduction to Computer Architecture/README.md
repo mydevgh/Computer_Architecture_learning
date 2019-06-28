@@ -22,6 +22,9 @@
 - [Lecture 12: Memory Interference and QoS](#12)
 - [Lecture 13: Memory Interference and QoS (II)](#13)
 - [Lecture 15: Multi-Core Cache Management](#15)
+- [Lecture 16: Heterogeneous Multi-Core](#16)
+- [Lecture 17: Latency Tolerance and Prefetching](#17)
+- [Lecture 18: Prefetching](#18)
 - []()
 
 
@@ -543,6 +546,61 @@ QoS 太细节了，主要是我并不知道底层硬件可以提供什么，需�
 ### Cache Compression
 
 > 维护起来太复杂，记得 leveldb 里面 SSTable format，简直了。。
+
+
+&nbsp;   
+<a id="16"></a>
+## Lecture 16: Heterogeneous Multi-Core
+
+Heterogeneous + trade-off
+
+
+&nbsp;   
+<a id="17"></a>
+## Lecture 17: Latency Tolerance and Prefetching
+
+### Memory Latency Tolerance
+
+out-of-order instruction execution：有一个 instruction window，可以按照 data flow dependency 来乱序执行，但是 instruction 必须按顺序 retire (可以理解为 commit)
+
+- caching
+- prefetching
+- multi-threading
+- out-of-order execution
+
+### Runahead Execution
+
+<img src="./assets/17_small_instruction_window.png" width="400"/>
+
+有一个 long cycle instruction 把整个 window stall 了。
+
+<img src="./assets/17_run_ahead_execution.png" width="400"/>
+
+- 执行 load，并且存储当前状态，继续向前执行，遇到 long cycle load 就执行，并跳过
+  - 不 update architecture state，不 update memory（太难了）
+- 直到 fetch 结束，回退到之前的状态（第三行的红色表示回退的 penalty）
+- 重新开始执行（这样之后的若干个 fetch miss 已经 hit）
+
+> 那我想说，run-ahead 还执行那些运算指令干啥，就只执行 memory access instruction 就好了，反正运算指令还是会重新执行一遍的。   
+> 也许某些内存地址是需要计算的。。。   
+> 还不能更新 memory，要在别的地方存起来，这也太坑了。。
+
+### Wrong Path Events
+
+out-of-order 有可能执行到 mispredicted path
+
+比如 array access 最后 prefetch 越界，并解引用
+
+
+&nbsp;   
+<a id="18"></a>
+## Lecture 18: Prefetching
+
+- prefetch address
+  - locality based
+- prefetch 存到哪
+- prefetch request 和 memory request 调度
+- 什么时候 prefetch
 
 
 &nbsp;   
