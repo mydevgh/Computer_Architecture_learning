@@ -25,6 +25,8 @@
 - [Lecture 16: Heterogeneous Multi-Core](#16)
 - [Lecture 17: Latency Tolerance and Prefetching](#17)
 - [Lecture 18: Prefetching](#18)
+- [Lecture 19: Multiprocessors, Consistency, Coherence](#19)
+- [Lecture 20: Cache Coherence](#20)
 - []()
 
 
@@ -601,6 +603,48 @@ out-of-order 有可能执行到 mispredicted path
 - prefetch 存到哪
 - prefetch request 和 memory request 调度
 - 什么时候 prefetch
+
+
+&nbsp;   
+<a id="19"></a>
+## Lecture 19: Multiprocessors, Consistency, Coherence
+
+### Parallel Bottelneck
+
+- Synchronization
+- Load Imbalance
+- Resource Contention
+
+### Memory Consistency
+
+- Consistency：所有内存操作的顺序
+- Coherence：在同一个内存位置上的操作顺序
+- Sequential Consistency：所有 processor 看到的内存操作顺序是一致的，即 total order
+
+### Cache Coherence
+
+- update broadcast
+- invalidate broadcast
+
+### Directory Based Cache Coherence
+
+中间人协调 processor，进行 invalidation，并记录每个 memory block 信息。
+
+
+&nbsp;   
+<a id="20"></a>
+## Lecture 20: Cache Coherence
+
+每个 processor 的 private cache 的每个 cache line 都有以下状态
+
+- M (modified)：独占写
+- E (exclusive)：独占只读
+- S (shared)：共享只读
+- I (invalid)
+
+有读写内存位置时，发送 request，每个 processor 监听 bus，据此改变自己 cache line 的状态
+
+<img src="./assets/MESI.png" width="400"/>
 
 
 &nbsp;   
