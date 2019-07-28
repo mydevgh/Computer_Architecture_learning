@@ -27,7 +27,7 @@
 - [Lecture 18: Prefetching](#18)
 - [Lecture 19: Multiprocessors, Consistency, Coherence](#19)
 - [Lecture 20: Cache Coherence](#20)
-- []()
+- [Lecture 21: Interconnects](#21)
 
 
 &nbsp;   
@@ -648,8 +648,25 @@ out-of-order 有可能执行到 mispredicted path
 
 
 &nbsp;   
-<a id=""></a>
-## 
+<a id="21"></a>
+## Lecture 21: Interconnects
+
+### Topology
+
+将控制流汇聚点提前，比如 buffer，然后调度   
+设计上：减少冲突 (low contention)，可扩展 (scalibility)   
+各种结构
+
+### Routing
+
+- Deterministic
+- Oblivious (random to balance network load)
+- Adaptive (network state)
+
+### Buffering and Flow Control
+
+- contention
+
 
 &nbsp;   
 <a id=""></a>
