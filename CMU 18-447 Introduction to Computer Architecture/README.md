@@ -28,6 +28,7 @@
 - [Lecture 19: Multiprocessors, Consistency, Coherence](#19)
 - [Lecture 20: Cache Coherence](#20)
 - [Lecture 21: Interconnects](#21)
+- [Lecture 22: Interconnects II](#22)
 
 
 &nbsp;   
@@ -666,8 +667,12 @@ out-of-order 有可能执行到 mispredicted path
 ### Buffering and Flow Control
 
 - contention
+- buffered / bufferless
+- virtual channel
 
 
 &nbsp;   
-<a id=""></a>
-## 
+<a id="22"></a>
+## Lecture 22: Interconnects II
+
+> 听不懂啊。。
