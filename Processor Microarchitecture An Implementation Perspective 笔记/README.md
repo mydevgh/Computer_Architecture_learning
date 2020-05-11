@@ -14,6 +14,12 @@
 <a id="1"></a>
 ## 1 Introduction
 
+<p/><img src="assets/Fig1.1.png" width=480/>
+
+<p/><img src="assets/IA32OM-Fig16.2.png" width=600/>
+
+<p/><img src="assets/Nehalem-Fig3.png" width=720/>
+
 
 &nbsp;   
 <a id="2"></a>
