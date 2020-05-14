@@ -58,8 +58,8 @@
   - 通常 offset 长度就是 cacheline 大小
 - index 部分作为 hashed key
 - tag 存储在 tag array 中用于确认地址
-      - 本质上就是找到 hash bucket 之后还要比较原始 key
-      - 因为 set associativity 所以多路比较 tag
+  - 本质上就是找到 hash bucket 之后还要比较原始 key
+  - 因为 set associativity 所以多路比较 tag
 
 <p/><img src="assets/Fig2.2.png" width=540/>
 
