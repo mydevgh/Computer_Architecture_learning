@@ -130,6 +130,71 @@ miss 分为 3 种
 <a id="3"></a>
 ## 3 The Instruction Fetch Unit
 
+为了让流水线打满每一个 cycle，需要在 IF 时就计算 next fetch address。难度在于分支指令（conditional branch, jump, subroutine call, subroutine return）
+
+面临3个问题：
+
+- 是否是 Branch Instruction
+- Taken / Not Taken
+- Target Address / Next Address
+
+<p/><img src="assets/Fig3.1.png" width=600/>
+
+### Instruction Cache
+
+<p/><img src="assets/Fig3.2.png" width=420/>
+
+- 传统 Cache：存储 instruction in static order（二进制顺序）
+- **Trace Cache**：存储 instruction in **dynamic order**
+  - replication, bandwidth
+
+### Branch Target Buffer
+
+<p/><img src="assets/Fig3.3.png" width=420/>
+
+<p/><img src="assets/MPDFoSP-Fig7.6.png" width=720/>
+
+<p/><img src="assets/MPDFoSP-Fig7.7.png" width=480/>
+
+- BTB: linear address -> target linear(virtual?) address
+
+### Return Address Stack
+
+### Conditional Branch Prediction
+
+#### Static Prediction
+
+- compiler knowledge
+- ISA 提供一些暗示指令
+- 利用一些规律，比如 loop 向上跳转
+
+#### Dynamic Prediction
+
+- saturating counter：若历史是连贯有规律，效果很好
+  - 资源有限：伪共享
+      - PC: address hash
+      - branch global history: pattern history table
+      - 一种有效手段是：branch global history XOR PC
+
+<p/><img src="assets/Fig3.4.png" width=480/>
+
+<p/><img src="assets/Fig3.5.png" width=480/>
+
+<p/><img src="assets/Fig3.6.png" width=480/>
+
+- hybrid: selector
+  - warm-up，对冲
+  - selector 可能也是 saturating counter
+
+<p/><img src="assets/Fig3.7.png" width=480/>
+
+### Reference
+
+- [The microarchitecture of Intel, AMD and VIA CPUs](https://www.agner.org/optimize/microarchitecture.pdf)
+- [Microbenchmarking Return Address Branch Prediction](http://blog.stuffedcow.net/2018/04/ras-microbenchmarks/)
+- [Branch Prediction Review](https://courses.cs.washington.edu/courses/csep548/06au/lectures/branchPred.pdf)
+- 《Modern Processor Design - Fundamentals of Superscalar Processors》
+
 
 &nbsp;   
 <a id="4"></a>
