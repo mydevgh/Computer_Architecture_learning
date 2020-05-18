@@ -200,6 +200,43 @@ miss 分为 3 种
 <a id="4"></a>
 ## 4 Decode
 
+### RISC Decoding
+
+<p/><img src="assets/Fig4.1.png" width=480/>
+
+- fixed instruction length
+- simple format
+
+### The x86 ISA
+
+<p/><img src="assets/Fig4.2.png" width=600/>
+
+- variable length
+  - 由 opcode 和 ModR/M 决定
+  - opcode 决定是否存在 ModR/M
+  - ModR/M 决定是否存在 SIB
+  - prefix 长度 0-4
+- complex format
+  - operand 位置可变
+  - 反正各种乱
+
+### Dynamic Translation
+
+- CISC -> RISC-like micro-ops
+
+### High-Performance x86 Decoding
+
+- Instruction Length Decoder: raw byte stream -> insturctions
+- Dynamic Translation Unit: instructions -> micro-ops
+
+<p/><img src="assets/Fig4.3.png" width=600/>
+
+<p/><img src="assets/Intel_Nehalem_arch.svg" width=1080/>
+
+### Reference
+
+- [The microarchitecture of Intel, AMD and VIA CPUs](https://www.agner.org/optimize/microarchitecture.pdf)
+
 
 &nbsp;   
 <a id="5"></a>
