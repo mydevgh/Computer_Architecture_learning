@@ -233,6 +233,8 @@ miss 分为 3 种
 
 <p/><img src="assets/Intel_Nehalem_arch.svg" width=1080/>
 
+<p/><img src="assets/Nehalem-Fig4.png" width=900/>
+
 ### Reference
 
 - [The microarchitecture of Intel, AMD and VIA CPUs](https://www.agner.org/optimize/microarchitecture.pdf)
@@ -241,6 +243,81 @@ miss 分为 3 种
 &nbsp;   
 <a id="5"></a>
 ## 5 Allocation
+
+- register renaming：消除 false dependences
+  - 思路上类似 Multi-Versioning
+- instruction dispatch：分配资源
+  - issue queue entry（或 RS）
+  - ROB entry
+  - load/store buffer entry
+
+<p/><img src="assets/Fig5.1.png" width=480/>
+
+- dependences
+  - data: read from
+  - name: write after ...
+
+### Renaming through The Reorder Buffer
+
+<p/><img src="assets/Fig5.2.png" width=480/>
+
+- ROB 存 in-flight register value
+- architectural register file 存 latest committed register value
+- register map table 存 register 的最新定义位置
+
+### Renaming through A Rename Buffer
+
+- ROB 浪费 value filed
+
+### Merged Register File
+
+<p/><img src="assets/Fig5.3.png" width=480/>
+
+- register map table 存 register 最新定义位置
+- freelist
+  - 如何确定回收，如果不跟踪额外信息
+
+<p/><img src="assets/Fig5.4.png" width=480/>
+
+- 如果之后的使用同一 architectural register 的指令 commit，那么之前的 physical register 可以回收
+  - 考虑到 branch misprediction，下面条件是不足的
+      - 之后使用同一 architectural register 的指令被 fetched
+      - 之前访问 physical register 的指令 commit
+  - 如图，指令(2)提交后，p1 可以被回收
+  - 不跟踪读操作，因为时间戳是增长的，new write commit 保证 previous register 可以回收
+  - 那也就是说 ROB entry 需要存 logical register 对应的 previous physical register-ID？
+
+### Register File Read
+
+- read before execution（preferred）
+  - 需要存储空间
+  - execution 时要再读一遍
+  - 有些 non-available，之后 bypass network
+- read on execution
+  - 需要大量 port
+  - 只读一遍
+
+### Recovery in Case of Misspeculation
+
+- 释放资源
+- register map table 需要 undo
+
+### Comparison of The Three Schemes
+
+> 没搞懂 register value 到底在哪存？？？   
+> 本质上来说也很简单：新版本提交后旧版本就可以被回收了。   
+> 位置不同会影响 read/write interconnect 逻辑。   
+
+- 如果把 physical register 放到 ROB，就只需 FIFO 而不用维护 freelist
+  - register map table 从 logical register 映射到 ROB entry
+  - 为什么说 “ROB entry 需要记录 logical register 对应的 previous physical register-ID”？难道不是“去 register map table 查一下，对应的最新如果是自己，那就 update architectural state，否则直接结束”？
+
+<p/><img src="assets/Nehalem-Fig5.png" width=900/>
+
+### Reference
+
+- 《Modern Processor Design - Fundamentals of Superscalar Processors》
+- [The Architecture of the Nehalem Processor and Nehalem-EP SMP Platforms](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.455.4198&rep=rep1&type=pdf)
 
 
 &nbsp;   
