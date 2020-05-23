@@ -27,7 +27,7 @@
 <a id="2"></a>
 ## 2 Caches
 
-### Address Translation
+### 2.1 Address Translation
 
 - physical: processor & bus
 - virtual: app
@@ -46,7 +46,7 @@
       - aliasing：因为 virtual addr 和 physical addr 的 page offset 一样，因此如果 index 属于 page offset 的一部分，那么 physical tag 就可以保证没有 aliasing
       - 主要用于 L1 (i)cache
 
-### Cache Structure Organization
+### 2.2 Cache Structure Organization
 
 <p/><img src="assets/Fig2.1.png" width=540/>
 
@@ -69,7 +69,7 @@
 
 <p/><img src="assets/Fig2.4.png" width=540/>
 
-### Lockup-Free Caches
+### 2.3 Lockup-Free Caches
 
 当出现 memory request miss 时，允许 issue new memory request。把 miss 信息存储在 **MSHRs**（*miss status handling registers*）。MSHRs 相当于一个固定大小的池，负责记录和合并 missed L1Dcache request。
 
@@ -91,7 +91,7 @@ miss 分为 3 种
 
 还有另一种方案是 In-Cache MSHRs：将 MSHRs 做到 cache 内部，tag array 额外记录 cacheline 是否被 fetched 的标记。相当于把 cache miss 问题从计算层下放到存储层。好处是可以有相当多的 in-flight request。
 
-### Multiported Caches
+### 2.4 Multiported Caches
 
 - dual-ported cache：2 address decoders, 2 way multiplxers, 2 tag comparators, 2 aligners
   - 提高 bandwidth
@@ -107,7 +107,7 @@ miss 分为 3 种
 
 <p/><img src="assets/Fig2.7.png" width=540/>
 
-### Instruction Caches
+### 2.5 Instruction Caches
 
 - single-ported 而非 dual-ported：指令通常是连续执行，通常一次取出整个 cacheline
 - blocking 而非 lockup-free：指令整体上是按顺序执行，如果一条指令 miss，没有取其他指令的必要
@@ -142,7 +142,7 @@ miss 分为 3 种
 
 <p/><img src="assets/Fig3.1.png" width=600/>
 
-### Instruction Cache
+### 3.1 Instruction Cache
 
 <p/><img src="assets/Fig3.2.png" width=420/>
 
@@ -150,7 +150,7 @@ miss 分为 3 种
 - **Trace Cache**：存储 instruction in **dynamic order**
   - replication, bandwidth
 
-### Branch Target Buffer
+### 3.2 Branch Target Buffer
 
 <p/><img src="assets/Fig3.3.png" width=420/>
 
@@ -160,17 +160,17 @@ miss 分为 3 种
 
 - BTB: linear address -> target linear(virtual?) address
 
-### Return Address Stack
+### 3.3 Return Address Stack
 
-### Conditional Branch Prediction
+### 3.4 Conditional Branch Prediction
 
-#### Static Prediction
+#### 3.4.1 Static Prediction
 
 - compiler knowledge
 - ISA 提供一些暗示指令
 - 利用一些规律，比如 loop 向上跳转
 
-#### Dynamic Prediction
+#### 3.4.2 Dynamic Prediction
 
 - saturating counter：若历史是连贯有规律，效果很好
   - 资源有限：伪共享
@@ -202,14 +202,14 @@ miss 分为 3 种
 <a id="4"></a>
 ## 4 Decode
 
-### RISC Decoding
+### 4.1 RISC Decoding
 
 <p/><img src="assets/Fig4.1.png" width=480/>
 
 - fixed instruction length
 - simple format
 
-### The x86 ISA
+### 4.2 The x86 ISA
 
 <p/><img src="assets/Fig4.2.png" width=600/>
 
@@ -222,11 +222,11 @@ miss 分为 3 种
   - operand 位置可变
   - 反正各种乱
 
-### Dynamic Translation
+### 4.3 Dynamic Translation
 
 - CISC -> RISC-like micro-ops
 
-### High-Performance x86 Decoding
+### 4.4 High-Performance x86 Decoding
 
 - Instruction Length Decoder: raw byte stream -> insturctions
 - Dynamic Translation Unit: instructions -> micro-ops
@@ -259,7 +259,7 @@ miss 分为 3 种
   - data: read from
   - name: write after ...
 
-### Renaming through The Reorder Buffer
+### 5.1 Renaming through The Reorder Buffer
 
 <p/><img src="assets/Fig5.2.png" width=480/>
 
@@ -267,11 +267,11 @@ miss 分为 3 种
 - architectural register file 存 latest committed register value
 - register map table 存 register 的最新定义位置
 
-### Renaming through A Rename Buffer
+### 5.2 Renaming through A Rename Buffer
 
 - ROB 浪费 value filed
 
-### Merged Register File
+### 5.3 Merged Register File
 
 <p/><img src="assets/Fig5.3.png" width=480/>
 
@@ -289,7 +289,7 @@ miss 分为 3 种
   - 不跟踪读操作，因为时间戳是增长的，new write commit 保证 previous register 可以回收
   - 那也就是说 ROB entry 需要存 logical register 对应的 previous physical register-ID？
 
-### Register File Read
+### 5.4 Register File Read
 
 - read before execution（preferred）
   - 需要存储空间
@@ -299,12 +299,12 @@ miss 分为 3 种
   - 需要大量 port
   - 只读一遍
 
-### Recovery in Case of Misspeculation
+### 5.5 Recovery in Case of Misspeculation
 
 - 释放资源
 - register map table 需要 undo
 
-### Comparison of The Three Schemes
+### 5.6 Comparison of The Three Schemes
 
 > 没搞懂 register value 到底在哪存？？？   
 > 本质上来说也很简单：新版本提交后旧版本就可以被回收了。   
