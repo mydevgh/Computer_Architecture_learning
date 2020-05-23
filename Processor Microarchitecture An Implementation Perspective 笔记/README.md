@@ -1,5 +1,7 @@
 ## Processor Microarchitecture an Implementation Perspective 读书笔记
 
+> 因为没学过电路和硬件，很多方案在初看时无法进行深入的思考（主要是不清楚下层提供什么支持，上层需求是什么，有什么限制，各种设计有什么区别），只能拾人牙慧。 ~ 2020.05   
+
 - [1 Introduction](#1)
 - [2 Caches](#2)
 - [3 The Instruction Fetch Unit](#3)
@@ -323,6 +325,180 @@ miss 分为 3 种
 &nbsp;   
 <a id="6"></a>
 ## 6 The Issue Stage
+
+> 整个设计会随着 Register Filer, RS, ROB 的设计有些变化。要考虑到：   
+> 1. 数据被依赖时未完成计算   
+> 2. 数据计算完成时要 wakeup signal + bypass 传播   
+> 3. commit 时考虑哪些 entry 被释放，数据转移到哪里   
+
+### 6.1 Introduction
+
+- in-order / out-of-order
+- reservation station / distributed issue queue / unified issue queue
+- 注意 issue logic of memory operations
+
+### 6.2 In-Order Issue Logic
+
+- scoreboard
+  - data dependence table：追踪 register 是否可用
+  - resource table：追踪 EU 是否可用
+- VLIW
+
+### 6.3 Out-Order Issue Logic
+
+- read source operand before/on execution
+- 下面讨论统一假设 merged register file
+- memory dependences 直到 address 计算完才确定
+
+#### 6.3.1 Issue Process when Source Operands Are Read before Issue
+
+<p/><img src="assets/Fig6.1.png" width=600/>
+
+- Ctrl info：存储 execution meta
+  - 哪些 ALU
+  - 内存操作宽度
+  - 立即数使用
+- Src1/2Id：source operand id（register-id）
+- V1/2：source operand 是否 valid
+- Src1 data / Src2 data Or Imm：存放 input value
+- R1/2：表示数据是否 ready
+
+##### 6.3.1.1 Issue Queue Allocation
+
+<p/><img src="assets/Fig6.2.png" width=600/>
+
+- 分配 entry
+- 获取 renaming info 和 register value
+
+##### 6.3.1.2 Instruction Wakeup
+
+- 通知 source operands 计算完成
+- 传播（register-ID, value），在 issue queue 中检索并更新
+- 若 renaming table 中出现 register-id，标记为 available（之后 read before issue）
+- 因为 stage 并发，要保证没有 wakeup 遗漏
+  - 先获取 register-ID，再检查 available-bit（可以考虑单独一个表）
+  - 这些问题很简单，因为事件发生是以 cycle 为离散单位的，cycle 之间天然形成 *happens-before*
+
+<p/><img src="assets/Fig6.3.png" width=600/>
+
+- 提前 wakeup signal，减少 bubble
+- 通过 bypass 从 FU 传播到 FU
+- 把 wakeup 和 select 压缩到 1 个 cycle，以支持高性能 back-to-back execution
+
+有2种方案生成 wakeup signal：
+
+- 把生成 signal 做进 pipeline stage（固定位置，位于 execution 几个 cycle 之前）
+- 倒计时（shift register）
+
+这2种方案要求 instruction latency 是已知的，只对计算操作有效，而对内存访问操作无效。对 load 操作有2种策略：
+
+- conservative：延迟 signal，直到确认 load hit
+- speculative：平衡 load miss 的 penalty
+  - load 操作占程序 20%，延迟 signal 极大影响性能
+
+##### 6.3.1.3 Instruction Selection
+
+- 选择 ready 的指令
+  - source operands
+  - execution resources
+- 将 select 逻辑分散到 arbiters/schedulers，而不是做成一个单一 select 单元
+  - 原因是：**The timing of the selection logic is very critical since it has to be done after the wakeup logic to support back-to-back execution of single-cycle latency operations.**
+
+<p/><img src="assets/Fig6.4.png" width=540/>
+
+##### 6.3.1.4 Entry Reclamation
+
+- issue 之后 entry 可以被回收
+- speculative wakeup 需要 delay 回收
+
+#### 6.3.2 Issue Process when Source Operands Are Read after Issue
+
+<p/><img src="assets/Fig6.5.png" width=660/>
+
+<p/><img src="assets/Fig6.6.png" width=600/>
+
+##### 6.3.2.1 Read Port Reduction
+
+#### 6.3.3 Other Implementations for Out-of-Order Issue
+
+#### 6.3.3.1 Distributed Issue Queue
+
+- 指令分类，细化调度（比如内存操作和非内存操作）
+
+#### 6.3.3.2 Reservation Stations
+
+- 相当于把 issue queue 下放到各个 FU
+
+### 6.4 Issue Logic for Memory Operations
+
+<p/><img src="assets/Tab6.1.png" width=660/>
+
+- memory disambiguation policy
+  - non-speculative：需要确保和之前没有依赖才能执行
+  - speculaive：预测是否有依赖
+
+#### 6.4.1 Non-Speculative Memory Disambiguation
+
+##### 6.4.1.1 Case Study 1: Load Ordering and Store Ordering on an AMD K6 Processor
+
+<p/><img src="assets/Fig6.7.png" width=720/>
+
+- store
+  - store queue 顺序发射
+  - address generation，读 value
+  - (address, value) 存入 store buffer
+  - store buffer 顺序提交到 L1D
+- load
+  - load queue 顺序发射
+  - address generation
+  - 在 store buffer 中检查是否与 older store 产生 address 冲突
+      - 包括 address generation stage
+      - scheduler 保证 older store address 都被检查了（这保证了 **single processor program order**）
+
+#### 6.4.1.2 Case Study 2: Partial Ordering on a MIPS R10000 Processor
+
+<p/><img src="assets/Fig6.8.png" width=720/>
+
+store 顺序；load 可以乱序只要之前的 address 已经被计算完成
+
+- load/store queue 顺序发射
+- indetermination matrix：标记 address 是否被计算完成
+- dependency matrix：标记 load 依赖 store address
+- address queue：记录 address，load 需要比较并标记依赖
+
+<p/><img src="assets/Fig6.9.png" width=480/>
+
+<p/><img src="assets/Fig6.10.png" width=480/>
+
+- store 顺序发射，重置 dependency matrix column
+- load 等待 dependency matrix row 重置
+
+#### 6.4.2 Speculative Memory Disambiguation
+
+- load 不需要等待之前的 store 完成地址计算
+- speculative issue load，需要处理 misprediction 和 recover
+
+##### 6.4.2.1 Case Study: Alpha 21264
+
+<p/><img src="assets/Fig6.11.png" width=720/>
+
+- load-load memory violation trap：通过检测 younger 但已经 issued 的 load
+- store-load memory violation trap：通过检测 younger 但已经 issued 的 load
+- retire in program order：因此虽然 store 可以 out-of-order issue，但不需要检测 store-store memory violation trap
+
+### 6.5 Speculative Wakeup of Load Consumers
+
+<p/><img src="assets/Fig6.12.png" width=600/>
+
+- 平衡 bubble 与 penalty
+  - back-to-back execution
+  - missepculation
+- 激进的策略可能导致 architectural hazard（比如 deadlock）
+  - 跟踪更多信息
+
+### Reference
+
+- 《Modern Processor Design - Fundamentals of Superscalar Processors》
 
 
 &nbsp;   
