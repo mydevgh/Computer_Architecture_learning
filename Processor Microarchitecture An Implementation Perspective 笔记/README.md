@@ -658,3 +658,68 @@ store 顺序；load 可以乱序只要之前的 address 已经被计算完成
 <a id="8"></a>
 ## 8 The Commit Stage
 
+- **architectural state**: in-order commit
+- **speculative state**: in-flight 状态
+- x86 micro-op：全部完成才 commit
+  - 例外：fast string operation 填满 retirement window
+- 回收资源
+
+### 8.2 Architectural State Management
+
+- store 一直在 store buffer 直到 commit
+- load 需要检查 store buffer
+- load 在 commit 时是否需要一直持有 cacheline 来保证 store-load order？
+
+### 8.2.1 Architectural State Based on a Retire Register File
+
+<p/><img src="assets/Fig8.1.png" width=600/>
+
+<p/><img src="assets/Fig8.2.png" width=600/>
+
+- ROB：环形队列
+  - ROB entry: (instruction info, produced value)
+- ROB entry commit
+  - 更新 register map table（如果仍 renamed 到这个 entry，否则 discard）
+  - 数据写回 retirement register file（如果仍 renamed 到这个 entry，否则 discard）
+  - **bypass**
+      - read before issue：？data read 读不到会产生 bubble？？
+      - read after issue：需要 invalidate 所有 stage 中 ROB entry 的引用
+
+### 8.2.2 Architectural State Based on a Merged Register File
+
+- 省空间，不需要移动数据和 bypass 通知
+- 需要确定何时才能回收某个 register
+  - 如果之后的使用同一 architectural register 的指令 commit，那么之前的 physical register 可以回收
+
+### 8.3 Recovery of the Speculative State
+
+### 8.3.1 Recovery form a Branch Misprediction
+
+<p/><img src="assets/Fig8.3.png" width=660/>
+
+- front-end recovery
+  - flush rename 之前的 wrong path
+  - 恢复 branch predictor
+  - 修正 PC
+- back-end recovery：从 microarchitecture 中移除 bogus-instruction
+  - issue queue / reorder buffer / memory order buffer
+  - register map table
+
+<p/>
+
+- ROB + Retirement Register File
+  - 等待 wrong path 之前 commit
+  - 恢复 register map table
+- Merged Refister File
+  - 不需要等待 wrong path 之前 commit，需要维护 register map table
+      - undo/redo log：根据 checkpoint 在 mispredicted 前后区分
+      - checkpoint：对 register map table 进行快照
+
+### 8.3.2 Recovery from an Exception
+
+- exception 需要等到 commit stage 处理
+  - 确定不是 speculative
+  - 需要保留顺序执行到这条指令前的 architectural state
+- 清空所有 in-flight
+  - speculative 按照 misprediction 恢复
+- front-end 重定向到 exception handler
