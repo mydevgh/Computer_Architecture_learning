@@ -309,6 +309,10 @@ miss 分为 3 种
 > 没搞懂 register value 到底在哪存？？？   
 > 本质上来说也很简单：新版本提交后旧版本就可以被回收了。   
 > 位置不同会影响 read/write interconnect 逻辑。   
+>    
+> **我倾向于这2种：**   
+> **1. architectural register file + reorder buffer（存数据）**   
+> **2. merged register file + reorder buffer（存索引）**   
 
 - 如果把 physical register 放到 ROB，就只需 FIFO 而不用维护 freelist
   - register map table 从 logical register 映射到 ROB entry
@@ -504,6 +508,150 @@ store 顺序；load 可以乱序只要之前的 address 已经被计算完成
 &nbsp;   
 <a id="7"></a>
 ## 7 Execute
+
+<p/><img src="assets/Fig7.1.png" width=540/>
+
+- FPU / ALU / AGU / BRU
+- data cache
+- bypassing network
+
+### 7.1 Functional Units
+
+#### 7.1.1 Integer Arithmetic and Logical Unit
+
+#### 7.1.2 Integer Multiplication and Division
+
+- IMUL, IDIV：因为 area 和 power，通常做进 FPU，integer->float->integer（那宽度怎么办？IEEE754？）
+
+#### 7.1.3 Address Generation Unit
+
+- **flat** memory model: linear address space
+- **segmented** memory model
+  - logical address: (segment ID, offset)
+  - linear address = segment base + offset
+
+<p/><img src="assets/Fig7.2.png" width=600/>
+
+<p/><img src="assets/Fig7.3.png" width=600/>
+
+- 1st cycle
+  - 计算 **offset = base + (index * scale) + displacement**
+  - 读 segment base 和 limit，从 segment register file
+- 2nd cycle
+  - 计算 **linear address** = segment base + offset
+  - 检查 offset 是否满足 limit
+  - 检查 segment 访问许可
+
+#### 7.1.4 Branch Unit
+
+- 执行 control-flow instruction (branch, jump, call, return)
+- 生成 next instruction address
+
+<p/><img src="assets/Fig7.4.png" width=480/>
+
+- direct absolute：指令给出 next PC
+- direct PC-relative：指令给出 next PC offset
+- indirect：指令给出 register 表示 next PC
+
+#### 7.1.5 Float-Point Unit
+
+- float-point arithmetic
+- conversion
+
+#### 7.1.6 SIMD Unit
+
+<p/><img src="assets/Fig7.5.png" width=480/>
+
+<p/><img src="assets/Fig7.6.png" width=480/>
+
+### 7.2 Result Bypassing
+
+> 假设 merged register file   
+
+<p/><img src="assets/Fig7.7.png" width=480/>
+
+<p/><img src="assets/Fig7.8.png" width=540/>
+
+- speculatively read from noncommitted state
+- compiler & Out-of-Order engine fill bubbles
+
+<p/><img src="assets/Fig7.9.png" width=600/>
+
+- 省去中间步骤，直接从 producer bypass 到 consumer
+  - bypass network 是 execution engine 中的重要设计，影响 area, power, critical path, physical layout
+
+#### 7.2.1 Bypass in a Small Out-of-Order Machine
+
+<p/><img src="assets/Fig7.10.png" width=600/>
+
+- multiplexor
+  - from register file
+  - from FU
+  - from other FU
+- result bus
+
+#### 7.2.2 Multilevel Bypass for Wide Out-of-Order Machines
+
+<p/><img src="assets/Fig7.11.png" width=600/>
+
+<p/><img src="assets/Fig7.12.png" width=540/>
+
+<p/><img src="assets/Fig7.13.png" width=540/>
+
+- Fig7.13 显示 I1 数据流在多个 stages 间 bypass，与 Fig7.11 Fig7.12 相匹配
+
+#### 7.2.3 Bypass for In-Order Machines
+
+- staging：延迟 write-back，为了保证 state in-order
+  - staging latch：将 in-flight result 拿住
+  - 为了减少 bubble：所有 staging 处进行 bypass
+
+<p/><img src="assets/Fig7.14.png" width=600/>
+
+<p/><img src="assets/Fig7.15.png" width=660/>
+
+<p/><img src="assets/Fig7.16.png" width=660/>
+
+- merged register file 为每个 staging 准备空间
+
+#### 7.2.4 Organization of Functional Units
+
+- ALU / AGU 设计 bypass network：整数运算和地址有数据依赖
+- Float-Point / SIMD Unit 设计 bypass network
+- memory load 到 ALU / AGU 以及 Float-Point / SIMD 设计 bypass network：数据运算对数据加载有依赖
+
+### 7.3 Clustering
+
+解决复杂度的方法：**对关键部分进行 partition**（如果workload允许拆分）
+
+#### 7.3.1 Clustering the Bypass Network
+
+<p/><img src="assets/Fig7.17.png" width=600/>
+
+- FU 只允许 bypass 到自己
+
+#### 7.3.2 Clutering with Replicated Register Files
+
+<p/><img src="assets/Fig7.18.png" width=600/>
+
+> **计算结点扩展，存储结点备份**   
+
+- 4 个 FU 分开到 2 个 cluster，每个 cluster 拥有 register file 备份
+  - 减少了 port
+- unified issue queue
+  - inter-cluster communication（怎么协调数据依赖产生的交互呢）
+
+#### 7.3.3 Clustering with Distributed Queue and Register Files
+
+<p/><img src="assets/Fig7.19.png" width=600/>
+
+> **计算存储分离，share everything**，但是存储非一致性访问   
+
+- 4 个 FU 分开到 2 个 cluster，每个 cluster 独占一部分 register file
+- result 不 broadcast，但允许 communicate
+- rename stage 将 issue queue 分开：**instruction steering mechanism**
+  - 减少依赖，减少 inter-cluster communication
+  - 平衡 workload
 
 
 &nbsp;   
