@@ -1,4 +1,4 @@
-## Processor Microarchitecture an Implementation Perspective 读书笔记
+# Processor Microarchitecture an Implementation Perspective 读书笔记
 
 > 因为没学过电路和硬件，很多方案在初看时无法进行深入的思考（主要是不清楚下层提供什么支持，上层需求是什么，有什么限制，各种设计有什么区别），只能拾人牙慧。 ~ 2020.05   
 
