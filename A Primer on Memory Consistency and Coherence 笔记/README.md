@@ -1,14 +1,14 @@
 # A Primer on Memory Consistency and Coherence
 
-- [Introduction to Consistency and Coherence](#1)
-- [Coherence Basics](#2)
-- [Memory Consistency Motivation and Sequential Consistency](#3)
-- [Total Store Order and the x86 Memory Model](#4)
-- [Relaxed Memory Consistency](#5)
-- [Coherence Protocols](#6)
-- [Snooping Coherence Protocols](#7)
-- [Directory Coherence Protocols](#8)
-- [Advanced Topics in Coherence](#9)
+- [1 Introduction to Consistency and Coherence](#1)
+- [2 Coherence Basics](#2)
+- [3 Memory Consistency Motivation and Sequential Consistency](#3)
+- [4 Total Store Order and the x86 Memory Model](#4)
+- [5 Relaxed Memory Consistency](#5)
+- [6 Coherence Protocols](#6)
+- [7 Snooping Coherence Protocols](#7)
+- [8 Directory Coherence Protocols](#8)
+- [9 Advanced Topics in Coherence](#9)
 
 &nbsp;   
 <a id="1"></a>
