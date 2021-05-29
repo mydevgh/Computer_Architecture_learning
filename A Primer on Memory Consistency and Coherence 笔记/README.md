@@ -1,4 +1,4 @@
-# A Primer on Memory Consistency and Coherence
+# A Primer on Memory Consistency and Coherence 2nd 笔记
 
 - [1 Introduction to Consistency and Coherence](#1)
 - [2 Coherence Basics](#2)
@@ -9,10 +9,12 @@
 - [7 Snooping Coherence Protocols](#7)
 - [8 Directory Coherence Protocols](#8)
 - [9 Advanced Topics in Coherence](#9)
+- [10 Consistency and Coherence for Heterogeneous Systems](#10)
+- [11 Specifying and Validating Memory Consistency Models and Cache Coherence](#11)
 
 &nbsp;   
 <a id="1"></a>
-## 1 Introduction to Consistency and Coherence 
+## 1 Introduction to Consistency and Coherence
 
 
 &nbsp;   
@@ -27,7 +29,7 @@
 
 &nbsp;   
 <a id="4"></a>
-## 4 Total Store Order and the x86 Memory Model
+## 4 Total Store Order and the X86 Memory Model
 
 
 &nbsp;   
@@ -53,4 +55,14 @@
 &nbsp;   
 <a id="9"></a>
 ## 9 Advanced Topics in Coherence
+
+
+&nbsp;   
+<a id="10"></a>
+## 10 Consistency and Coherence for Heterogeneous Systems
+
+
+&nbsp;   
+<a id="11"></a>
+## 11 Specifying and Validating Memory Consistency Models and Cache Coherence
 
